@@ -5,9 +5,11 @@ import type {
     PanVerificationResponse,
     BasicDetailsResponse,
     FinboxResponse,
+    LoanOffersResponse,
 } from '../types';
 
 const BASE_URL = 'https://loans-api.ramfincorp.com';
+const USER_SERVICE_URL = 'https://userservice.ramfincorp.com';
 const UTM_SOURCE = 'MMMSMR';
 
 class ApiService {
@@ -189,6 +191,47 @@ class ApiService {
                 body: JSON.stringify({
                     entityId: this.entityId,
                     leadID: this.leadID,
+                }),
+            }
+        );
+
+        return await response.json();
+    }
+
+    async getLoanOffers(): Promise<ApiResponse<LoanOffersResponse>> {
+        const response = await fetch(
+            `${USER_SERVICE_URL}/api/loan-list-view`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.jwtToken}`,
+                },
+                body: JSON.stringify({
+                    leadID: this.leadID,
+                }),
+            }
+        );
+
+        return await response.json();
+    }
+
+    async getApprovalDetails(productId: string, amount: number, tenureDays: number): Promise<ApiResponse> {
+        const response = await fetch(
+            `${BASE_URL}/customer_onboarding/approval-view`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.jwtToken}`,
+                },
+                body: JSON.stringify({
+                    leadID: this.leadID,
+                    productID: productId,
+                    amount: amount,
+                    tenureDays: tenureDays,
                 }),
             }
         );

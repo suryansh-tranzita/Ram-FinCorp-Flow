@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Building2, ExternalLink, CheckCircle2 } from "lucide-react";
+import { Loader2, Building2, ExternalLink, CheckCircle2, Banknote, Landmark } from "lucide-react";
 import { apiService } from "@/services/api";
+import type { LoanOffer } from "@/types";
 
 interface OfferStepProps {
     entityId?: string;
@@ -14,6 +15,8 @@ export function OfferStep({ entityId, redirectUrl }: OfferStepProps) {
     const [finboxUrl, setFinboxUrl] = useState("");
     const [error, setError] = useState("");
     const [lastResponse, setLastResponse] = useState<any>(null);
+    const [offers, setOffers] = useState<LoanOffer[]>([]);
+    const [fetchingOffers, setFetchingOffers] = useState(false);
 
 
     useEffect(() => {
@@ -33,9 +36,26 @@ export function OfferStep({ entityId, redirectUrl }: OfferStepProps) {
             callFinboxBankConnect();
         } else {
             setLoading(false);
-
         }
+
+        // Fetch loan offers
+        fetchOffers();
     }, [entityId]);
+
+    const fetchOffers = async () => {
+        setFetchingOffers(true);
+        try {
+            const response = await apiService.getLoanOffers();
+            if (response.success && response.data) {
+                const availableOffers = response.data.loans || response.data.products || [];
+                setOffers(availableOffers);
+            }
+        } catch (err) {
+            console.error("Failed to fetch offers:", err);
+        } finally {
+            setFetchingOffers(false);
+        }
+    };
 
     const callFinboxBankConnect = async () => {
         try {
@@ -176,6 +196,86 @@ export function OfferStep({ entityId, redirectUrl }: OfferStepProps) {
                             </Button>
                         </div>
                     </div>
+                </div>
+
+                {/* Loan Offers Section */}
+                <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-bold flex items-center gap-2">
+                            <Banknote className="w-5 h-5 text-primary" />
+                            Tailored Loan Offers for You
+                        </h3>
+                        {fetchingOffers && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+                    </div>
+
+                    {offers.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-4">
+                            {offers.map((offer, index) => (
+                                <div
+                                    key={offer.product_id || index}
+                                    className="relative bg-white border-2 border-primary/10 rounded-xl p-5 hover:border-primary/30 transition-all hover:shadow-md cursor-pointer group overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 p-2 bg-primary/10 rounded-bl-xl text-[10px] font-bold text-primary uppercase tracking-wider">
+                                        Best Match
+                                    </div>
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                                                <Landmark className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-lg text-gray-900">{offer.product_name}</h4>
+                                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                                                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                                        <span className="font-medium text-gray-700">Tenure:</span> {offer.tenure} Months
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                                        <span className="font-medium text-gray-700">Interest:</span> {offer.interest_rate}% p.a.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-2 border-t md:border-t-0 pt-4 md:pt-0">
+                                            <div className="text-right">
+                                                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Approved Amount</p>
+                                                <p className="text-2xl font-black text-primary">₹{offer.loan_amount.toLocaleString()}</p>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                className="rounded-full px-6 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                                                onClick={() => handleViewOffers()}
+                                            >
+                                                Select
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between">
+                                        <span className="text-[11px] text-muted-foreground italic flex items-center gap-1">
+                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                            Standard verification required
+                                        </span>
+                                        <span className="text-[11px] font-semibold text-primary">
+                                            Processing Fee: ₹{offer.processing_fee}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : !fetchingOffers ? (
+                        <div className="bg-gray-50 rounded-xl border border-dashed border-gray-200 p-8 text-center text-muted-foreground">
+                            <p className="text-sm font-medium">Analyzing your profile for more offers...</p>
+                            <Button
+                                variant="link"
+                                size="sm"
+                                className="mt-2 text-primary"
+                                onClick={fetchOffers}
+                            >
+                                Refresh Results
+                            </Button>
+                        </div>
+                    ) : null}
                 </div>
 
                 <div className="bg-muted/50 rounded-lg p-4 mt-6">

@@ -56,3 +56,17 @@ export interface FinboxResponse {
     url?: string;
     redirectUrl?: string;
 }
+export interface LoanOffer {
+    application_id?: string;
+    product_name: string;
+    loan_amount: number;
+    tenure: number;
+    interest_rate: string;
+    processing_fee: string;
+    product_id: string;
+}
+
+export interface LoanOffersResponse {
+    loans?: LoanOffer[];
+    products?: LoanOffer[];
+}

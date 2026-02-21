@@ -1,0 +1,1263 @@
+{
+  "info": {
+    "_postman_id": "130f382a-67eb-4258-8c59-fafcea840a6f",
+    "name": "Ram FinCorp",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46866674",
+    "_collection_link": "https://go.postman.co/collection/46866674-130f382a-67eb-4258-8c59-fafcea840a6f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "login-byMobile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse the response JSON\r",
+              "let jsonData = pm.response.json();\r",
+              "\r",
+              "// Check if success and token exists\r",
+              "if (jsonData?.success && jsonData?.data?.request_id) {\r",
+              "    pm.collectionVariables.set(\"request_id\", jsonData.data.request_id);\r",
+              "    console.log(\"Verify token saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"Verify token not found in response.\");\r",
+              "}\r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"mobile\": \"6392948845\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customers/customer-login-byMobile?utm_source=MMMSMR",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customers",
+            "customer-login-byMobile"
+          ],
+          "query": [
+            {
+              "key": "utm_source",
+              "value": "MMMSMR"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "verify-otp",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse the response JSON\r",
+              "let jsonData = pm.response.json();\r",
+              "\r",
+              "// Check if success and token exists\r",
+              "if (jsonData?.success && jsonData?.data?.jwtToken) {\r",
+              "    pm.collectionVariables.set(\"jwtToken\", jsonData.data.jwtToken);\r",
+              "    console.log(\"jwtToken saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"jwtToken not found in response.\");\r",
+              "}\r",
+              "\r",
+              "// Check if success and token exists\r",
+              "if (jsonData?.success && jsonData?.data?.accessToken) {\r",
+              "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);\r",
+              "    console.log(\"accessToken saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"accessToken not found in response.\");\r",
+              "}\r",
+              "if (jsonData?.success && jsonData?.data?.customer && jsonData?.data?.customer?.mobile) {\r",
+              "    pm.collectionVariables.set(\"mobile\", jsonData?.data?.customer?.mobile);\r",
+              "    console.log(\"mobile saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"mobile not found in response.\");\r",
+              "}\r",
+              "if (jsonData?.success && jsonData?.data?.customer && jsonData?.data?.customer?.customerID) {\r",
+              "    pm.collectionVariables.set(\"customerID\", jsonData?.data?.customer?.customerID);\r",
+              "    console.log(\"customerID saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"customerID not found in response.\");\r",
+              "}\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.customer && jsonData?.data?.customer?.name) {\r",
+              "    pm.collectionVariables.set(\"name\", jsonData?.data?.customer?.name);\r",
+              "    console.log(\"name saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"name not found in response.\");\r",
+              "}\r",
+              "if (jsonData?.success && jsonData?.data?.lead && jsonData?.data?.lead?.customer_type) {\r",
+              "    pm.collectionVariables.set(\"customer_type\", jsonData?.data?.lead?.customer_type);\r",
+              "    console.log(\"customer_type saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"customer_type not found in response.\");\r",
+              "}\r",
+              "if (jsonData?.success && jsonData?.data?.lead && jsonData?.data?.lead?.leadID) {\r",
+              "    pm.collectionVariables.set(\"leadID\", jsonData?.data?.lead?.leadID);\r",
+              "    console.log(\"leadID saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"leadID not found in response.\");\r",
+              "}\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.lead && jsonData?.data?.lead?.leadStatus) {\r",
+              "    pm.collectionVariables.set(\"leadStatus\", jsonData?.data?.lead?.leadStatus);\r",
+              "    console.log(\"leadStatus saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"leadStatus not found in response.\");\r",
+              "}\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.lead && jsonData?.data?.lead?.leadType) {\r",
+              "    pm.collectionVariables.set(\"leadType\", jsonData?.data?.lead?.leadType);\r",
+              "    console.log(\"leadType saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"leadType not found in response.\");\r",
+              "}\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.lead && jsonData?.data?.lead?.productId) {\r",
+              "    pm.collectionVariables.set(\"productId\", jsonData?.data?.lead?.productId);\r",
+              "    console.log(\"productId saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"productId not found in response.\");\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"request_id\": \"{{request_id}}\",\r\n    \"otp\": \"840326\",\r\n    \"whatsapp_consent\": true,\r\n    \"consent\": true,\r\n    \"bankfetch_consent\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customers/verify-otp?utm_source=MMMSMR",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customers",
+            "verify-otp"
+          ],
+          "query": [
+            {
+              "key": "utm_source",
+              "value": "MMMSMR"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "next-step",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse the response JSON\r",
+              "let jsonData = pm.response.json();\r",
+              "\r",
+              "// Check if success and token exists\r",
+              "if (jsonData?.success && jsonData?.data?.step?.product_id) {\r",
+              "    pm.collectionVariables.set(\"productId\", jsonData.data.step?.product_id);\r",
+              "    console.log(\"productId saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"productId not found in response.\");\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"leadID\": \"{{leadID}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/step/next-step",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "step",
+            "next-step"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "pan-verification",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Parse the response JSON\r",
+              "let jsonData = pm.response.json();\r",
+              "\r",
+              "let reqJsonData = pm.request.json();\r",
+              "\r",
+              "\r",
+              "if (reqJsonData && reqJsonData?.pan_number) {\r",
+              "    pm.collectionVariables.set(\"pan_number\", reqJsonData?.pan_number);\r",
+              "    console.log(\"pan_number saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"client_id not found in response.\");\r",
+              "}\r",
+              "\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.client_id) {\r",
+              "    pm.collectionVariables.set(\"client_id\", jsonData.data.client_id);\r",
+              "    console.log(\"client_id saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"client_id not found in response.\");\r",
+              "}\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.pan_number) {\r",
+              "    pm.collectionVariables.set(\"pan_number\", jsonData.data.pan_number);\r",
+              "    console.log(\"pan_number saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"pan_number not found in response.\");\r",
+              "}\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.full_name) {\r",
+              "    pm.collectionVariables.set(\"full_name\", jsonData.data.full_name);\r",
+              "    console.log(\"full_name saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"full_name not found in response.\");\r",
+              "}\r",
+              "\r",
+              "\r",
+              "if (jsonData?.success && jsonData?.data?.masked_aadhaar) {\r",
+              "    pm.collectionVariables.set(\"masked_aadhaar\", jsonData.data.masked_aadhaar);\r",
+              "    console.log(\"masked_aadhaar saved to collection variables!\");\r",
+              "} else {\r",
+              "    console.log(\"masked_aadhaar not found in response.\");\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"panNumber\": \"KHDPK9144R\",\r\n    \"pinCode\": \"226010\",\r\n    \"loanPurpose\": \"Other\",\r\n    \"leadID\": \"{{leadID}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customer_onboarding/pan-verification",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customer_onboarding",
+            "pan-verification"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "pan-confirmation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"panNumber\": \"KHDPK9144R\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customer_onboarding/pan-confirmation",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customer_onboarding",
+            "pan-confirmation"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get-basic-details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customer_onboarding/get-basic-details?customerId={{customerID}}&leadId={{leadID}}",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customer_onboarding",
+            "get-basic-details"
+          ],
+          "query": [
+            {
+              "key": "customerId",
+              "value": "{{customerID}}"
+            },
+            {
+              "key": "leadId",
+              "value": "{{leadID}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "basic-details",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"monthlyIncome\": \"22000\",\r\n    \"employmentType\": \"Salaried\",\r\n    \"salaryMode\": \"Bank Transfer\",\r\n    \"salaryDate\": \"31\",\r\n    \"finboxCallBackUrl\": \"https://loans.ramfincorp.com/finbox-status\",\r\n    \"monthlyIncomeConsent\": true,\r\n    \"leadID\": \"{{leadID}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customer_onboarding/basic-details",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customer_onboarding",
+            "basic-details"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "finbox-bank-connect",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"entityId\": \"{{entityId}}\",\r\n    \"leadID\": \"{{leadID}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customer_onboarding/finbox-bank-connect",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customer_onboarding",
+            "finbox-bank-connect"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "loan-list-view",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"leadID\": \"{{leadID}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://userservice.ramfincorp.com/api/loan-list-view",
+          "protocol": "https",
+          "host": [
+            "userservice",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "api",
+            "loan-list-view"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "approval-view",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"leadID\": \"{{leadID}}\",\r\n    \"productID\": \"{{product_id}}\",\r\n    \"amount\": 18000,\r\n    \"tenureDays\": 16\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customer_onboarding/approval-view",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customer_onboarding",
+            "approval-view"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "next-step",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"leadID\": \"{{leadID}}\",\r\n    \"accountID\": \"\",\r\n    \"isReload\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/step/next-step",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "step",
+            "next-step"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "customers/details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en-GB,en-US;q=0.9,en;q=0.8"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwtToken}}"
+          },
+          {
+            "key": "Connection",
+            "value": "keep-alive"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Origin",
+            "value": "https://loans.ramfincorp.com"
+          },
+          {
+            "key": "Referer",
+            "value": "https://loans.ramfincorp.com/"
+          },
+          {
+            "key": "Sec-Fetch-Dest",
+            "value": "empty"
+          },
+          {
+            "key": "Sec-Fetch-Mode",
+            "value": "cors"
+          },
+          {
+            "key": "Sec-Fetch-Site",
+            "value": "same-site"
+          },
+          {
+            "key": "User-Agent",
+            "value": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?1"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"Android\""
+          }
+        ],
+        "url": {
+          "raw": "https://loans-api.ramfincorp.com/customers/details",
+          "protocol": "https",
+          "host": [
+            "loans-api",
+            "ramfincorp",
+            "com"
+          ],
+          "path": [
+            "customers",
+            "details"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "request_id",
+      "value": ""
+    },
+    {
+      "key": "jwtToken",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "mobile",
+      "value": ""
+    },
+    {
+      "key": "customerID",
+      "value": ""
+    },
+    {
+      "key": "customer_type",
+      "value": ""
+    },
+    {
+      "key": "leadID",
+      "value": ""
+    },
+    {
+      "key": "leadStatus",
+      "value": ""
+    },
+    {
+      "key": "leadType",
+      "value": ""
+    },
+    {
+      "key": "name",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": ""
+    },
+    {
+      "key": "pan_number",
+      "value": ""
+    }
+  ]
+}

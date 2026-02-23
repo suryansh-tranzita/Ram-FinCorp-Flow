@@ -198,7 +198,7 @@ class ApiService {
         return await response.json();
     }
 
-    async getLoanOffers(): Promise<ApiResponse<LoanOffersResponse>> {
+    async getLoanOffers(): Promise<LoanOffersResponse> {
         const response = await fetch(
             `${USER_SERVICE_URL}/api/loan-list-view`,
             {

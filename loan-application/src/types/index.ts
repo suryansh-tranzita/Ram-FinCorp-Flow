@@ -57,16 +57,26 @@ export interface FinboxResponse {
     redirectUrl?: string;
 }
 export interface LoanOffer {
-    application_id?: string;
-    product_name: string;
-    loan_amount: number;
-    tenure: number;
-    interest_rate: string;
-    processing_fee: string;
-    product_id: string;
+    ProductID: number;
+    Titel: string;
+    SubTitle: string;
+    Image: string;
+    AmountDetails: {
+        Amount: number;
+        ROI: number;
+        Message: string;
+    };
+    TenureDetails: {
+        Tenure: number;
+        Message: string;
+    };
+    isPL?: boolean;
+    finbox_required?: boolean;
 }
 
 export interface LoanOffersResponse {
-    loans?: LoanOffer[];
-    products?: LoanOffer[];
+    status: string;
+    message: string;
+    data: LoanOffer[];
+    isLoanAmountUpgradable: boolean;
 }

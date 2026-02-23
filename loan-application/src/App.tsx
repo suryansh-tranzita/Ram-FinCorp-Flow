@@ -28,6 +28,7 @@ function App() {
   const [offerData, setOfferData] = useState<{
     entityId?: string;
     redirectUrl?: string;
+    leadStatus?: string;
   }>({});
 
   useEffect(() => {
@@ -38,15 +39,20 @@ function App() {
     }
   }, []);
 
-  const handleAuthComplete = () => {
-    setCurrentStep(2);
+  const handleAuthComplete = (leadStatus?: string) => {
+    setOfferData(prev => ({ ...prev, leadStatus }));
+    if (leadStatus === "Approved Process") {
+      setCurrentStep(3);
+    } else {
+      setCurrentStep(2);
+    }
   };
 
   const handleBasicDetailsComplete = (data: {
     entityId?: string;
     redirectUrl?: string;
   }) => {
-    setOfferData(data);
+    setOfferData(prev => ({ ...prev, ...data }));
     setCurrentStep(3);
   };
 
@@ -91,6 +97,7 @@ function App() {
             <OfferStep
               entityId={offerData.entityId}
               redirectUrl={offerData.redirectUrl}
+              leadStatus={offerData.leadStatus}
             />
           )}
         </div>

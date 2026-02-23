@@ -7,7 +7,7 @@ import { Loader2, Phone, Lock } from "lucide-react";
 import { apiService } from "@/services/api";
 
 interface AuthStepProps {
-    onComplete: () => void;
+    onComplete: (leadStatus?: string) => void;
 }
 
 export function AuthStep({ onComplete }: AuthStepProps) {
@@ -48,7 +48,7 @@ export function AuthStep({ onComplete }: AuthStepProps) {
             const response = await apiService.verifyOtp(requestId, otp);
 
             if (response.success) {
-                onComplete();
+                onComplete(response.data?.lead?.leadStatus);
             } else {
                 setError(response.message || "Invalid OTP");
             }

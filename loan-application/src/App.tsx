@@ -3,6 +3,7 @@ import { Stepper } from "./components/Stepper";
 import { AuthStep } from "./components/steps/AuthStep";
 import { BasicDetailsStep } from "./components/steps/BasicDetailsStep";
 import { OfferStep } from "./components/steps/OfferStep";
+import { LoanLanding } from "./components/steps/LoanLanding";
 import "./index.css";
 
 const steps = [
@@ -24,10 +25,10 @@ const steps = [
 ];
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [authData, setAuthData] = useState({ mobile: "", requestId: "" });
   const [offerData, setOfferData] = useState<{
     entityId?: string;
-    redirectUrl?: string;
     leadStatus?: string;
   }>({});
 
@@ -39,81 +40,109 @@ function App() {
     }
   }, []);
 
-  const handleAuthComplete = (leadStatus?: string) => {
-    setOfferData(prev => ({ ...prev, leadStatus }));
-    if (leadStatus === "Approved Process") {
+  const handleFlowStep = (response: any) => {
+    // Check both possible locations for current_route based on latest API example
+    const currentRoute = response.data?.current_route || response.data?.step?.current_route;
+
+    // Store relevant data from response
+    setOfferData({
+      entityId: response.data?.entityId,
+      leadStatus: response.data?.lead?.leadStatus
+    });
+
+    // Priority 1: Check if lead is already approved
+    if (response.data?.lead?.leadStatus === "Approved Process") {
+      setCurrentStep(3);
+      return;
+    }
+
+    // Priority 2: Follow the current_route from API
+    if (currentRoute === "pan verfit" || currentRoute === "basic detail") {
+      setCurrentStep(2);
+    } else if (currentRoute === "/finbox" || currentRoute === "finbox") {
       setCurrentStep(3);
     } else {
+      // Default to Basic Details if unknown
       setCurrentStep(2);
     }
   };
 
-  const handleBasicDetailsComplete = (data: {
-    entityId?: string;
-    redirectUrl?: string;
-  }) => {
-    setOfferData(prev => ({ ...prev, ...data }));
+  const handleAuthComplete = (response: any) => {
+    handleFlowStep(response);
+  };
+
+  const handleBasicDetailsComplete = () => {
     setCurrentStep(3);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 dark:from-slate-950 dark:via-purple-950 dark:to-blue-950">
+    <div className="h-screen flex flex-col bg-[#F2F7FF] overflow-hidden text-slate-900 relative">
+      {/* Decorative Gradient Background */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_0%_0%,_#BEDAFF_0%,_transparent_70%),radial-gradient(circle_at_100%_100%,_#B4D1FF_0%,_transparent_70%),radial-gradient(circle_at_50%_50%,_#E1EFFF_0%,_transparent_100%)] opacity-90" />
       {/* Header */}
-      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-border sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">R</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  Ram FinCorp
-                </h1>
-                <p className="text-xs text-muted-foreground">Loan Application</p>
-              </div>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Step {currentStep} of {steps.length}
-            </div>
-          </div>
+      <header className="bg-white/40 backdrop-blur-md border-b border-white/10 flex-shrink-0 relative z-10">
+        <div className="container mx-auto px-6 py-4">
+          <img
+            src="https://framerusercontent.com/images/eoFn6ZAhFTjiRuWZQ7B34zClMM.png?scale-down-to=512"
+            alt="Samridhya Logo"
+            className="h-8 w-auto object-contain"
+          />
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Stepper */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <Stepper steps={steps} currentStep={currentStep} />
-        </div>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="container mx-auto px-6 flex-1 flex flex-col items-center justify-center">
+          {/* Stepper (Only for steps after landing) */}
+          {currentStep > 0 && currentStep < 3 && (
+            <div className="w-full max-w-4xl mx-auto mb-8 flex-shrink-0">
+              <Stepper steps={steps} currentStep={currentStep} />
+            </div>
+          )}
 
-        {/* Step Content */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {currentStep === 1 && <AuthStep onComplete={handleAuthComplete} />}
-          {currentStep === 2 && (
-            <BasicDetailsStep onComplete={handleBasicDetailsComplete} />
-          )}
-          {currentStep === 3 && (
-            <OfferStep
-              entityId={offerData.entityId}
-              redirectUrl={offerData.redirectUrl}
-              leadStatus={offerData.leadStatus}
-            />
-          )}
+          {/* Step Content */}
+          <div className="w-full h-full flex items-center justify-center animate-in fade-in duration-500">
+            {currentStep === 0 && (
+              <LoanLanding
+                onOtpSent={(mobile, requestId) => {
+                  setAuthData({ mobile, requestId });
+                  setCurrentStep(1);
+                }}
+              />
+            )}
+            {currentStep === 1 && (
+              <AuthStep
+                onComplete={handleAuthComplete}
+                initialMobile={authData.mobile}
+                initialRequestId={authData.requestId}
+              />
+            )}
+            {currentStep === 2 && (
+              <BasicDetailsStep onComplete={handleBasicDetailsComplete} />
+            )}
+            {currentStep === 3 && (
+              <div className="overflow-auto w-full h-full flex items-start justify-center py-8">
+                <OfferStep
+                  entityId={offerData.entityId}
+                  leadStatus={offerData.leadStatus}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 py-8 border-t border-border bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              © 2026 Ram FinCorp. All rights reserved.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Secure and encrypted loan application process
-            </p>
-          </div>
+      <footer className="py-6 border-t border-white/10 bg-white/40 backdrop-blur-md flex-shrink-0 relative z-10">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <img
+            src="https://framerusercontent.com/images/eoFn6ZAhFTjiRuWZQ7B34zClMM.png?scale-down-to=512"
+            alt="Samridhya Logo"
+            className="h-5 w-auto object-contain opacity-40"
+          />
+          <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400">
+            © {new Date().getFullYear()} Samridhya • Secure & Encrypted
+          </p>
         </div>
       </footer>
     </div>

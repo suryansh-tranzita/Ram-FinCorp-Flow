@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, CheckCircle2, Banknote, Landmark } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { apiService } from "@/services/api";
 import type { LoanOffer } from "@/types";
 
 interface OfferStepProps {
     entityId?: string;
-    redirectUrl?: string;
     leadStatus?: string;
 }
 
-export function OfferStep({ entityId, redirectUrl, leadStatus }: OfferStepProps) {
+export function OfferStep({ entityId, leadStatus }: OfferStepProps) {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
     const [offers, setOffers] = useState<LoanOffer[]>([]);
     const [fetchingOffers, setFetchingOffers] = useState(false);
+    const [isUpgradable, setIsUpgradable] = useState(false);
+    const [selectingOffer, setSelectingOffer] = useState<number | null>(null);
+    const [connectingFinbox, setConnectingFinbox] = useState(false);
 
 
     useEffect(() => {
@@ -37,7 +38,6 @@ export function OfferStep({ entityId, redirectUrl, leadStatus }: OfferStepProps)
 
     const fetchOffers = async () => {
         setFetchingOffers(true);
-        setError("");
         try {
             const response = await apiService.getLoanOffers();
             console.log("Full API Response:", response);
@@ -46,10 +46,12 @@ export function OfferStep({ entityId, redirectUrl, leadStatus }: OfferStepProps)
             let offersData: LoanOffer[] = [];
             let status = "";
             let message = "";
+            let upgradable = false;
 
             if (response && typeof response === 'object') {
                 status = String(response.status || "");
                 message = response.message || "";
+                upgradable = !!response.isLoanAmountUpgradable;
 
                 if (Array.isArray(response.data)) {
                     offersData = response.data;
@@ -58,55 +60,81 @@ export function OfferStep({ entityId, redirectUrl, leadStatus }: OfferStepProps)
                 }
             }
 
+            setIsUpgradable(upgradable);
+
             if (offersData.length > 0) {
                 setOffers(offersData);
             } else {
-                if (status === "1" || message === "Success") {
-                    setError("No pre-approved offers found. Please try refreshing or contact support.");
+                // If it's a known "no record" case, don't show a red error box
+                // Just clear offers and let the empty state UI handle it
+                if (status === "0" || message === "No approval record found") {
+                    console.log("No approval record found");
+                } else if (status === "1" || message === "Success") {
+                    console.log("Success with empty data");
                 } else {
-                    setError(message || "Currently no offers are available for your profile.");
+                    console.warn(message || "Currently no offers are available.");
                 }
                 setOffers([]);
             }
         } catch (err) {
             console.error("Critical error in fetchOffers:", err);
-            setError("Unable to load offers. Please check your internet connection and try again.");
         } finally {
             setFetchingOffers(false);
         }
     };
 
-    // Simplified flow: fetching offers directly now
+    const handleOfferSelect = async (offer: LoanOffer) => {
+        setSelectingOffer(offer.ProductID);
+        try {
+            const response = await apiService.getApprovalDetails(
+                offer.ProductID.toString(),
+                offer.AmountDetails.Amount,
+                offer.TenureDetails.Tenure
+            );
 
-    // Offers are now rendered directly in the list below
-    const handleViewOffers = () => {
-        const leadID = apiService.getLeadID();
-        const utmSource = 'MMMSMR';
-
-        if (redirectUrl) {
-            try {
-                const url = new URL(redirectUrl);
-                if (url.hostname.includes('ramfincorp.com')) {
-                    url.searchParams.set('leadID', leadID);
-                    url.searchParams.set('leadId', leadID);
-                    url.searchParams.set('utm_source', utmSource);
-                    window.location.href = url.toString();
-                } else {
-                    window.location.href = redirectUrl;
-                }
-            } catch (e) {
-                window.location.href = redirectUrl;
+            if (response.success && response.data?.redirectUrl) {
+                window.location.href = response.data.redirectUrl;
+            } else if (response.message) {
+                console.warn("Offer selection warning:", response.message);
+            } else {
+                console.error("Unable to proceed with this offer.");
             }
-        } else {
-            window.location.href = `https://loans.ramfincorp.com?leadID=${leadID}&leadId=${leadID}&utm_source=${utmSource}&offer=true`;
+        } catch (err) {
+            console.error("Error selecting offer:", err);
+        } finally {
+            setSelectingOffer(null);
         }
     };
+
+    const handleFinboxConnect = async () => {
+        setConnectingFinbox(true);
+        try {
+            const response = await apiService.finboxBankConnect();
+            if (response.success && (response.data?.url || response.data?.redirectUrl)) {
+                window.location.href = (response.data.url || response.data.redirectUrl) as string;
+            } else {
+                console.error(response.message || "Unable to initiate verification.");
+            }
+        } catch (err) {
+            console.error("Error connecting to Finbox:", err);
+        } finally {
+            setConnectingFinbox(false);
+        }
+    };
+
 
     if (loading) {
         return (
             <Card className="w-full max-w-md mx-auto shadow-xl border-2">
                 <CardContent className="flex flex-col items-center justify-center py-12">
-                    <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                    <div className="relative mb-6">
+                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping scale-150" />
+                        <img
+                            src="https://framerusercontent.com/images/eoFn6ZAhFTjiRuWZQ7B34zClMM.png?scale-down-to=512"
+                            alt="Samridhya Logo"
+                            className="h-12 w-auto object-contain relative z-10 animate-pulse"
+                        />
+                    </div>
                     <p className="text-lg font-medium">Processing your application...</p>
                     <p className="text-sm text-muted-foreground mt-2">Please wait</p>
                 </CardContent>
@@ -115,10 +143,15 @@ export function OfferStep({ entityId, redirectUrl, leadStatus }: OfferStepProps)
     }
 
     return (
-        <Card className="w-full max-w-2xl mx-auto shadow-xl border-2">
+        <Card className="w-full max-w-4xl mx-auto shadow-none border-white/20 rounded-none bg-gradient-to-br from-white/80 via-white/50 to-white/30 backdrop-blur-xl">
             <CardHeader className="space-y-3">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                    <CheckCircle2 className="w-8 h-8 text-primary" />
+
+                <div className="flex justify-center mb-4">
+                    <img
+                        src="https://framerusercontent.com/images/eoFn6ZAhFTjiRuWZQ7B34zClMM.png?scale-down-to=512"
+                        alt="Samridhya Logo"
+                        className="h-8 w-auto object-contain"
+                    />
                 </div>
                 <CardTitle className="text-center text-2xl font-black">
                     {leadStatus === "Approved Process"
@@ -132,97 +165,88 @@ export function OfferStep({ entityId, redirectUrl, leadStatus }: OfferStepProps)
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                {error && (
-                    <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-                        {error}
-                    </div>
-                )}
-
-                {/* Directly show offers, removing the choice grid */}
+                {/* Error messages are now handled via console or subtle empty states */}
 
                 {/* Loan Offers Section */}
                 <div className="space-y-4 pt-4">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold flex items-center gap-2">
-                            <Banknote className="w-5 h-5 text-primary" />
-                            Tailored Loan Offers for You
+                            Loan Offers for You
                         </h3>
                         {fetchingOffers && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
                     </div>
 
                     {offers.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-6">
-                            {offers.map((offer) => (
-                                <div
-                                    key={offer.ProductID}
-                                    className="relative bg-white border-2 border-primary/5 rounded-2xl p-6 hover:border-primary/20 transition-all hover:shadow-xl cursor-pointer group overflow-hidden"
-                                >
-                                    <div className="absolute top-0 right-0 px-4 py-1.5 bg-green-500 rounded-bl-2xl text-[10px] font-black text-white uppercase tracking-widest shadow-sm">
-                                        Approved
-                                    </div>
-
-                                    <div className="flex gap-5">
-                                        <div className="w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden p-2 group-hover:scale-105 transition-transform">
-                                            {offer.Image ? (
-                                                <img src={offer.Image} alt={offer.Titel} className="w-full h-full object-contain" />
-                                            ) : (
-                                                <Landmark className="w-8 h-8 text-primary/40" />
-                                            )}
-                                        </div>
-
-                                        <div className="flex-1 space-y-1">
-                                            <h4 className="font-extrabold text-xl text-slate-900 group-hover:text-primary transition-colors">
-                                                {offer.Titel}
-                                            </h4>
-                                            <p className="text-sm text-slate-500 leading-relaxed max-w-[90%]">
-                                                {offer.SubTitle}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-6 pt-6 border-t border-slate-50 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                                        <div className="flex gap-8">
-                                            <div>
-                                                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">
-                                                    {offer.AmountDetails.Message}
-                                                </p>
-                                                <p className="text-3xl font-black text-slate-900">
-                                                    ₹{offer.AmountDetails.Amount.toLocaleString()}
-                                                </p>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                                {offers.map((offer) => (
+                                    <div
+                                        key={offer.ProductID}
+                                        onClick={() => !selectingOffer && handleOfferSelect(offer)}
+                                        className={`relative bg-white border rounded-xl p-6 overflow-hidden ${selectingOffer === offer.ProductID
+                                            ? "border-primary ring-1 ring-primary/10"
+                                            : "border-slate-100 cursor-pointer"
+                                            } ${selectingOffer && selectingOffer !== offer.ProductID ? "opacity-50 grayscale select-none" : ""}`}
+                                    >
+                                        {selectingOffer === offer.ProductID && (
+                                            <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary/10 rounded-bl-xl text-[10px] font-bold text-primary flex items-center gap-1">
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                                Processing
                                             </div>
-                                            <div className="border-l border-slate-100 pl-8">
-                                                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">
-                                                    {offer.TenureDetails.Message}
-                                                </p>
-                                                <p className="text-xl font-bold text-slate-700">
-                                                    {offer.TenureDetails.Tenure} Months
+                                        )}
+
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-16 h-16 rounded-xl bg-slate-50 border border-slate-50 flex items-center justify-center shrink-0 overflow-hidden p-2">
+                                                {offer.Image ? (
+                                                    <img src={offer.Image} alt={offer.Titel} className="w-full h-full object-contain" />
+                                                ) : (
+                                                    <div className="bg-primary/10 w-full h-full rounded-lg" />
+                                                )}
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-lg text-slate-900">
+                                                    {offer.Titel}
+                                                </h4>
+                                                <p className="text-sm text-slate-500">
+                                                    {offer.SubTitle}
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col items-center md:items-end gap-2">
-                                            <div className="text-right hidden md:block">
-                                                <p className="text-[10px] text-green-600 font-bold uppercase tracking-tighter">Interest Rate</p>
-                                                <p className="text-sm font-bold text-slate-600">{offer.AmountDetails.ROI}% p.a.</p>
+                                        <div className="mt-6 pt-6 border-t border-slate-50 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                                            <div className="flex gap-8">
+                                                <div>
+                                                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">
+                                                        {offer.AmountDetails.Message}
+                                                    </p>
+                                                    <p className="text-3xl font-black text-slate-900">
+                                                        ₹{offer.AmountDetails.Amount.toLocaleString()}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <Button
-                                                size="lg"
-                                                className="w-full md:w-auto rounded-xl px-10 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 font-bold text-base h-12"
-                                                onClick={() => handleViewOffers()}
-                                            >
-                                                Select Plan
-                                            </Button>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
 
-                                    <div className="mt-5 flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[11px] font-bold text-slate-600">
-                                            Available for instant disbursement to your bank
-                                        </span>
-                                    </div>
+                            {isUpgradable && (
+                                <div className="flex justify-center pt-4">
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-full px-8 py-6 border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition-all shadow-md"
+                                        onClick={handleFinboxConnect}
+                                        disabled={connectingFinbox}
+                                    >
+                                        {connectingFinbox ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Connecting...
+                                            </>
+                                        ) : "Get Loan Amount Upgrade"}
+                                    </Button>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     ) : !fetchingOffers ? (
                         <div className="bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
@@ -232,14 +256,19 @@ export function OfferStep({ entityId, redirectUrl, leadStatus }: OfferStepProps)
                             <h3 className="text-lg font-bold text-slate-900 mb-1">No Offers Found</h3>
                             <p className="text-sm text-slate-500 max-w-[250px] mx-auto mb-6">
                                 We couldn't find any pre-approved offers right now.
+                                Verify your details to get an offer.
                             </p>
                             <Button
-                                variant="outline"
-                                className="rounded-full px-8 border-primary/20 hover:bg-primary/5"
-                                onClick={fetchOffers}
+                                className="rounded-full px-10 py-6 bg-primary font-bold text-lg shadow-lg hover:scale-105 transition-transform"
+                                onClick={handleFinboxConnect}
+                                disabled={connectingFinbox}
                             >
-                                <Loader2 className={`mr-2 h-4 w-4 ${fetchingOffers ? 'animate-spin' : ''}`} />
-                                Try Refreshing
+                                {connectingFinbox ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Please wait...
+                                    </>
+                                ) : "Verify to Get Offer"}
                             </Button>
                         </div>
                     ) : null}

@@ -1,0 +1,65 @@
+{
+    "hosting": [
+        {
+            "site": "apply-partners-samridhya-com",
+            "public": "dist",
+            "ignore": [
+                "firebase.json",
+                "/.*",
+                "/node_modules/"
+            ],
+            "headers": [
+                {
+                    "source": "/.well-known/apple-app-site-association",
+                    "headers": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                {
+                    "source": "/.well-known/assetlinks.json",
+                    "headers": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                }
+            ],
+            "rewrites": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
+            ]
+        },
+        {
+            "site": "prod-samridhya-buyer",
+            "public": "build/buyer",
+            "ignore": [
+                "firebase.json",
+                "/.*",
+                "/node_modules/"
+            ],
+            "headers": [
+                {
+                    "source": "/.well-known/apple-app-site-association",
+                    "headers": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                }
+            ],
+            "rewrites": [
+                {
+                    "source": "",
+                    "destination": "/index.html"
+                }
+            ]
+        }
+    ]
+}
